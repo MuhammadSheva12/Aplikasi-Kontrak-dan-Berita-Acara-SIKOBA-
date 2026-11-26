@@ -7,6 +7,8 @@ import { z } from "zod";
 import React, { useState } from "react";
 import axios from "@/app/utils/axiosAPI";
 import { showError } from "@/app/utils/toast";
+import { isAxiosError } from "axios";
+import { getErrorMessage } from "@/app/utils/getErrorMessage";
 
 const aktivitasSchema = z.object({
   nama_aktivitas: z.string().min(1, "Nama aktivitas wajib diisi"),
@@ -32,11 +34,14 @@ export default function TambahAktivitas() {
     try {
       await axios.post("/aktivitas", data, { withCredentials: true });
       reset();
-      router.push("/admin/Aktivitas?status=success&message=" +
-          encodeURIComponent("Data berhasil ditambahkan!"));
-    } catch (error: any) {
-      const pesanError =
-        error.response?.data?.message || "Gagal menambahkan data aktivitas.";
+      router.push(
+        "/admin/Aktivitas?status=success&message=" +
+          encodeURIComponent("Data berhasil ditambahkan!"),
+      );
+    } catch (error) {
+      const pesanError = isAxiosError(error)
+        ? getErrorMessage(error, "Gagal menambahkan data aktivitas.")
+        : "Gagal menambahkan data aktivitas.";
       showError(pesanError);
     } finally {
       setIsLoading(false);
@@ -91,7 +96,13 @@ type InputProps = {
   error?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
-const Input = ({ label, placeholder, type = "text", error, ...rest }: InputProps) => {
+const Input = ({
+  label,
+  placeholder,
+  type = "text",
+  error,
+  ...rest
+}: InputProps) => {
   return (
     <div className="space-y-1">
       <label className="block text-sm font-medium text-gray-700">{label}</label>

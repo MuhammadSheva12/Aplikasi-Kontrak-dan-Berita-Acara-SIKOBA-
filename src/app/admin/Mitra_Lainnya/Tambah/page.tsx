@@ -37,16 +37,15 @@ export default function TambahMitraLainnya() {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      await axios.post("/mitra/lainnya", data, {
-      });
+      await axios.post("/mitra/lainnya", data, {});
 
       reset();
       showSuccess("Data berhasil ditambahkan!");
       router.push(
         "/admin/Mitra_Lainnya?success&message=" +
-          encodeURIComponent("Data berhasil ditambahkan!")
+          encodeURIComponent("Data berhasil ditambahkan!"),
       );
-    } catch (error: any) {
+    } catch (error) {
       const msg =
         error.response?.data?.message ||
         error.message ||

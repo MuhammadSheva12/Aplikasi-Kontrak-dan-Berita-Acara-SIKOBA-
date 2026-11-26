@@ -54,7 +54,9 @@ export default function KelolaUser() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [visiblePasswords, setVisiblePasswords] = useState<number[]>([]);
-  const [decryptedPasswords, setDecryptedPasswords] = useState<{ [key: number]: string }>({});
+  const [decryptedPasswords, setDecryptedPasswords] = useState<{
+    [key: number]: string;
+  }>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -85,7 +87,7 @@ export default function KelolaUser() {
       setUsers(usersRes.data?.data || usersRes.data || []);
       setTeknis(teknisRes.data?.data || teknisRes.data || []);
       setPegawai(pegawaiRes.data?.data || pegawaiRes.data || []);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Fetch error:", error);
 
       if (error.response?.status === 401 || error.response?.status === 403) {
@@ -94,7 +96,7 @@ export default function KelolaUser() {
 
       if (error.response) {
         setError(
-          `Error ${error.response.status}: ${error.response.data.message || "Server error"}`
+          `Error ${error.response.status}: ${error.response.data.message || "Server error"}`,
         );
       } else if (error.request) {
         setError("No response from server. Check your connection.");
@@ -113,8 +115,8 @@ export default function KelolaUser() {
       await axios.delete(`/users/${id}`);
       showSuccess("User berhasil dihapus!");
       setUsers(users.filter((user) => user.id !== id));
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal menghapus user, coba lagi.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal menghapus user, coba lagi."));
     }
   };
 
@@ -125,9 +127,9 @@ export default function KelolaUser() {
       if (!decryptedPassword) {
         const response = await axios.get(`/users/${user.id}/decrypt-password`);
         decryptedPassword = response.data.decryptedPassword;
-        setDecryptedPasswords(prev => ({
+        setDecryptedPasswords((prev) => ({
           ...prev,
-          [user.id]: decryptedPassword
+          [user.id]: decryptedPassword,
         }));
       }
 
@@ -140,7 +142,7 @@ export default function KelolaUser() {
         teknis_id: user.teknis_id || getTeknisIdByName(user.nama_teknis),
       });
       setIsEditModalOpen(true);
-    } catch (error: any) {
+    } catch (error) {
       showError("Gagal mengambil data user untuk edit.");
     }
   };
@@ -160,37 +162,43 @@ export default function KelolaUser() {
       });
 
       // Get the updated pegawai and teknis names
-      const updatedPegawai = pegawai.find(p => p.id === Number(editingUser.pegawai_id));
-      const updatedTeknis = teknis.find(t => t.id === Number(editingUser.teknis_id));
+      const updatedPegawai = pegawai.find(
+        (p) => p.id === Number(editingUser.pegawai_id),
+      );
+      const updatedTeknis = teknis.find(
+        (t) => t.id === Number(editingUser.teknis_id),
+      );
 
       // Update users state with complete data including the names
-      setUsers(users.map(user => 
-        user.id === editingUser.id 
-          ? { 
-              ...user,
-              username: editingUser.username,
-              role: editingUser.role,
-              pegawai_id: Number(editingUser.pegawai_id),
-              teknis_id: Number(editingUser.teknis_id),
-              nama_pegawai: updatedPegawai?.nama || user.nama_pegawai,
-              nama_teknis: updatedTeknis?.nama_teknis || user.nama_teknis,
-              // Include other fields from response if available
-              ...(response.data?.data || {})
-            }
-          : user
-      ));
+      setUsers(
+        users.map((user) =>
+          user.id === editingUser.id
+            ? {
+                ...user,
+                username: editingUser.username,
+                role: editingUser.role,
+                pegawai_id: Number(editingUser.pegawai_id),
+                teknis_id: Number(editingUser.teknis_id),
+                nama_pegawai: updatedPegawai?.nama || user.nama_pegawai,
+                nama_teknis: updatedTeknis?.nama_teknis || user.nama_teknis,
+                // Include other fields from response if available
+                ...(response.data?.data || {}),
+              }
+            : user,
+        ),
+      );
 
       // Update decrypted password cache
-      setDecryptedPasswords(prev => ({
+      setDecryptedPasswords((prev) => ({
         ...prev,
-        [editingUser.id]: editingUser.password
+        [editingUser.id]: editingUser.password,
       }));
 
       showSuccess("User berhasil diperbarui!");
       setIsEditModalOpen(false);
       setEditingUser(null);
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal memperbarui user.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal memperbarui user."));
     } finally {
       setIsSubmitting(false);
     }
@@ -203,28 +211,31 @@ export default function KelolaUser() {
 
   const getPegawaiIdByName = (name: string | number) => {
     const pegawaiData = pegawai.find(
-      (p) => p.id.toString() === name.toString() || p.nama === name
+      (p) => p.id.toString() === name.toString() || p.nama === name,
     );
     return pegawaiData?.id || "";
   };
 
   const getTeknisIdByName = (name: string | number) => {
     const teknisData = teknis.find(
-      (t) => t.id.toString() === name.toString() || t.nama_teknis === name
+      (t) => t.id.toString() === name.toString() || t.nama_teknis === name,
     );
     return teknisData?.id || "";
   };
 
   const getTeknisName = (teknisValue: string | number) => {
     const teknisData = teknis.find(
-      (t) => t.id.toString() === teknisValue.toString() || t.nama_teknis === teknisValue
+      (t) =>
+        t.id.toString() === teknisValue.toString() ||
+        t.nama_teknis === teknisValue,
     );
     return teknisData?.nama_teknis || teknisValue || "-";
   };
 
   const getPegawaiName = (pegawaiValue: string | number) => {
     const pegawaiData = pegawai.find(
-      (p) => p.id.toString() === pegawaiValue.toString() || p.nama === pegawaiValue
+      (p) =>
+        p.id.toString() === pegawaiValue.toString() || p.nama === pegawaiValue,
     );
     return pegawaiData?.nama || pegawaiValue || "-";
   };
@@ -268,8 +279,10 @@ export default function KelolaUser() {
   const currentData = filteredUsers.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => setCurrentPage(page);
-  const handlePrevious = () => currentPage > 1 && setCurrentPage(currentPage - 1);
-  const handleNext = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const handlePrevious = () =>
+    currentPage > 1 && setCurrentPage(currentPage - 1);
+  const handleNext = () =>
+    currentPage < totalPages && setCurrentPage(currentPage + 1);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-white pt-24 px-6 pb-4">
@@ -299,7 +312,9 @@ export default function KelolaUser() {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg px-4 py-2 shadow-sm">
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-[#30387B] rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-gray-700">Total Data:</span>
+            <span className="text-sm font-medium text-gray-700">
+              Total Data:
+            </span>
             <span className="bg-[#30387B] text-white text-sm font-bold px-3 py-1 rounded-full min-w-[40px] text-center">
               {filteredUsers.length}
             </span>
@@ -326,19 +341,30 @@ export default function KelolaUser() {
           <tbody>
             {currentData.length > 0 ? (
               currentData.map((item, index) => (
-                <tr key={item.id} className="border-b hover:bg-gray-50 transition-colors text-center">
+                <tr
+                  key={item.id}
+                  className="border-b hover:bg-gray-50 transition-colors text-center"
+                >
                   <td className="px-4 py-3">{startIndex + index + 1}</td>
-                  <td className="px-4 py-3">{getPegawaiName(item.nama_pegawai)}</td>
-                  <td className="px-4 py-3">{getTeknisName(item.nama_teknis)}</td>
+                  <td className="px-4 py-3">
+                    {getPegawaiName(item.nama_pegawai)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {getTeknisName(item.nama_teknis)}
+                  </td>
                   <td className="px-4 py-3">{item.username}</td>
                   <td className="px-4 py-3">
                     <div className="flex justify-center items-center gap-2">
                       <span className="font-mono truncate max-w-[100px]">
                         {visiblePasswords.includes(item.id)
                           ? decryptedPasswords[item.id] || (
-                              <span className="text-gray-400 italic">Memuat...</span>
+                              <span className="text-gray-400 italic">
+                                Memuat...
+                              </span>
                             )
-                          : maskPassword(decryptedPasswords[item.id] ?? "••••••")}
+                          : maskPassword(
+                              decryptedPasswords[item.id] ?? "••••••",
+                            )}
                       </span>
                       <button
                         onClick={() => togglePasswordVisibility(item.id)}
@@ -390,18 +416,27 @@ export default function KelolaUser() {
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="text-center py-6 text-gray-500 italic">
-                  {users.length === 0 ? "Data user kosong." : "Tidak ada hasil pencarian."}
+                <td
+                  colSpan={7}
+                  className="text-center py-6 text-gray-500 italic"
+                >
+                  {users.length === 0
+                    ? "Data user kosong."
+                    : "Tidak ada hasil pencarian."}
                 </td>
               </tr>
             )}
 
             {currentData.length < itemsPerPage &&
-              Array.from({ length: itemsPerPage - currentData.length }).map((_, i) => (
-                <tr key={`empty-${i}`}>
-                  <td colSpan={7} className="py-4">&nbsp;</td>
-                </tr>
-              ))}
+              Array.from({ length: itemsPerPage - currentData.length }).map(
+                (_, i) => (
+                  <tr key={`empty-${i}`}>
+                    <td colSpan={7} className="py-4">
+                      &nbsp;
+                    </td>
+                  </tr>
+                ),
+              )}
           </tbody>
         </table>
       </div>
@@ -439,10 +474,13 @@ export default function KelolaUser() {
                 </label>
                 <select
                   value={editingUser.pegawai_id}
-                  onChange={(e) => setEditingUser({
-                    ...editingUser,
-                    pegawai_id: e.target.value === '' ? '' : Number(e.target.value)
-                  })}
+                  onChange={(e) =>
+                    setEditingUser({
+                      ...editingUser,
+                      pegawai_id:
+                        e.target.value === "" ? "" : Number(e.target.value),
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   required
                   disabled={isSubmitting}
@@ -463,10 +501,13 @@ export default function KelolaUser() {
                 </label>
                 <select
                   value={editingUser.teknis_id}
-                  onChange={(e) => setEditingUser({
-                    ...editingUser,
-                    teknis_id: e.target.value === '' ? '' : Number(e.target.value)
-                  })}
+                  onChange={(e) =>
+                    setEditingUser({
+                      ...editingUser,
+                      teknis_id:
+                        e.target.value === "" ? "" : Number(e.target.value),
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   required
                   disabled={isSubmitting}
@@ -488,7 +529,9 @@ export default function KelolaUser() {
                 <input
                   type="text"
                   value={editingUser.username}
-                  onChange={(e) => setEditingUser({ ...editingUser, username: e.target.value })}
+                  onChange={(e) =>
+                    setEditingUser({ ...editingUser, username: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   required
                   disabled={isSubmitting}
@@ -503,7 +546,9 @@ export default function KelolaUser() {
                 <input
                   type="password"
                   value={editingUser.password}
-                  onChange={(e) => setEditingUser({ ...editingUser, password: e.target.value })}
+                  onChange={(e) =>
+                    setEditingUser({ ...editingUser, password: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   required
                   disabled={isSubmitting}
@@ -517,7 +562,12 @@ export default function KelolaUser() {
                 </label>
                 <select
                   value={editingUser.role}
-                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as "admin" | "user" })}
+                  onChange={(e) =>
+                    setEditingUser({
+                      ...editingUser,
+                      role: e.target.value as "admin" | "user",
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   required
                   disabled={isSubmitting}

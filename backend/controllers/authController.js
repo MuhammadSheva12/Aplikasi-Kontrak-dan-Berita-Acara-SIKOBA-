@@ -17,29 +17,27 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Username tidak ditemukan" });
     }
 
-    let decryptedPassword;
-    try {
-      decryptedPassword = decrypt(user.password);
-    } catch (err) {
-      console.error("Error dekripsi password:", err);
-      return res.status(500).json({ message: "Error saat dekripsi password" });
-    }
-
+    const decryptedPassword = decrypt(user.password);
     if (password !== decryptedPassword) {
       return res.status(401).json({ message: "Password salah" });
     }
 
+    // 🔑 JWT HARUS MENYIMPAN id_user
     const accessToken = jwt.sign(
-      { username: user.username, role: user.role },
+      {
+        id_user: user.id_user,
+        username: user.username,
+        role: user.role,
+      },
       process.env.JWT_SECRET,
       { expiresIn: ACCESS_TOKEN_EXPIRES_IN }
     );
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 1000, //  1 hour
+      secure: false,       // localhost
+      sameSite: "lax",     // 🔥 WAJIB
+      maxAge: 60 * 60 * 1000,
     });
 
     return res.json({
@@ -56,37 +54,22 @@ const loginUser = async (req, res) => {
 };
 
 const logoutUser = (req, res) => {
-  res.clearCookie("accessToken");
+  res.clearCookie("accessToken", {
+    sameSite: "lax",
+    secure: false,
+  });
   return res.json({ message: "Logout berhasil" });
 };
 
 const checkAuth = async (req, res) => {
-  try {
-    const { username, role } = req.user;
-
-    // Ambil data lengkap user dari database
-    const user = await getUserByUsername(username, role);
-    if (!user) {
-      return res.status(404).json({ message: "User tidak ditemukan" });
-    }
-
-    return res.json({
-      message: "Authenticated",
-      data: {
-        username: user.username,
-        role: user.role,
-        nama_pegawai: user.nama_pegawai,
-        nama_teknis: user.nama_teknis,
-      },
-    });
-  } catch (error) {
-    console.error("CheckAuth error:", error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
+  return res.json({
+    message: "Authenticated",
+    user: req.user,
+  });
 };
 
 module.exports = {
   loginUser,
   logoutUser,
-  checkAuth
+  checkAuth,
 };

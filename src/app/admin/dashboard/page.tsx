@@ -16,10 +16,10 @@ interface StatsData {
 
 export default function AdminDashboard() {
   const [dataCount, setDataCount] = useState<StatsData>({
-    pegawai: 0,
-    mitra: 0,
-    bast: 0,
-    kontrak: 0,
+    pegawai: 1,
+    mitra: 1,
+    bast: 1,
+    kontrak: 1,
   });
 
   const [loading, setLoading] = useState(true);

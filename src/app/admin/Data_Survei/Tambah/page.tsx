@@ -35,9 +35,9 @@ export default function TambahSurvei() {
       reset();
       router.push(
         "/admin/Data_Survei?status=success&message=" +
-          encodeURIComponent("Data berhasil ditambahkan!")
+          encodeURIComponent("Data berhasil ditambahkan!"),
       );
-    } catch (error: any) {
+    } catch (error) {
       const msg =
         error.response?.data?.message ||
         error.message ||
@@ -50,9 +50,7 @@ export default function TambahSurvei() {
 
   return (
     <div className="pt-24 px-6 min-h-screen bg-white">
-      <h1 className="text-2xl font-bold text-blue-950 mb-4">
-        Data Survei
-      </h1>
+      <h1 className="text-2xl font-bold text-blue-950 mb-4">Data Survei</h1>
 
       <h2 className="inline-block bg-[#30387B] text-white px-5 py-2 rounded mb-10">
         Form Tambah Data

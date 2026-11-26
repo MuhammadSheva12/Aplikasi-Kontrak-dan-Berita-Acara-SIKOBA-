@@ -32,15 +32,14 @@ export default function TambahPegawai() {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      await axios.post("/pegawai", data, {
-      });
+      await axios.post("/pegawai", data, {});
 
       reset();
       router.push(
         "/admin/Data_Pegawai?status=success&message=" +
-          encodeURIComponent("Data berhasil ditambahkan!")
+          encodeURIComponent("Data berhasil ditambahkan!"),
       );
-    } catch (error: any) {
+    } catch (error) {
       const msg =
         error.response?.data?.message ||
         error.message ||
@@ -53,9 +52,7 @@ export default function TambahPegawai() {
 
   return (
     <div className="pt-24 px-6 min-h-screen bg-white">
-      <h1 className="text-2xl font-bold text-blue-950 mb-4">
-        Data Pegawai
-      </h1>
+      <h1 className="text-2xl font-bold text-blue-950 mb-4">Data Pegawai</h1>
 
       <h2 className="inline-block bg-[#30387B] text-white px-5 py-2 rounded mb-10">
         Form Tambah Pegawai

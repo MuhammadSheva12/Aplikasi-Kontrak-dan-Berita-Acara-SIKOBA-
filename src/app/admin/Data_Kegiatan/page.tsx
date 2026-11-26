@@ -56,7 +56,8 @@ export default function DataKegiatanPage() {
 
   // Edit modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingKegiatan, setEditingKegiatan] = useState<EditKegiatanData | null>(null);
+  const [editingKegiatan, setEditingKegiatan] =
+    useState<EditKegiatanData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -71,22 +72,26 @@ export default function DataKegiatanPage() {
     try {
       setLoading(true);
       setError(null);
-      
-      const [kegiatanRes, teknisRes, aktivitasRes, surveiRes] = await Promise.all([
-        axios.get("/kegiatan"),
-        axios.get("/teknis"),
-        axios.get("/aktivitas"),
-        axios.get("/survei"),
-      ]);
+
+      const [kegiatanRes, teknisRes, aktivitasRes, surveiRes] =
+        await Promise.all([
+          axios.get("/kegiatan"),
+          axios.get("/teknis"),
+          axios.get("/aktivitas"),
+          axios.get("/survei"),
+        ]);
 
       setKegiatanList(kegiatanRes.data?.data || kegiatanRes.data || []);
       setTeknisList(teknisRes.data?.data || teknisRes.data || []);
       setAktivitasList(aktivitasRes.data?.data || aktivitasRes.data || []);
       setSurveiList(surveiRes.data?.data || surveiRes.data || []);
-    } catch (error: any) {
-      if (error.response?.status === 401 || error.response?.status === 403) return;
+    } catch (error) {
+      if (error.response?.status === 401 || error.response?.status === 403)
+        return;
       if (error.response) {
-        setError(`Error ${error.response.status}: ${error.response.data.message || "Server error"}`);
+        setError(
+          `Error ${error.response.status}: ${error.response.data.message || "Server error"}`,
+        );
       } else if (error.request) {
         setError("No response from server. Check your connection.");
       } else {
@@ -98,14 +103,15 @@ export default function DataKegiatanPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus data kegiatan ini?")) return;
+    if (!confirm("Apakah Anda yakin ingin menghapus data kegiatan ini?"))
+      return;
 
     try {
       await axios.delete(`/kegiatan/${id}`);
       showSuccess("Data kegiatan berhasil dihapus!");
       setKegiatanList(kegiatanList.filter((item) => item.id !== id));
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal menghapus data, coba lagi.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal menghapus data, coba lagi."));
     }
   };
 
@@ -113,7 +119,8 @@ export default function DataKegiatanPage() {
     setEditingKegiatan({
       id: kegiatan.id,
       teknis_id: kegiatan.teknis_id || getTeknisIdByName(kegiatan.nama_teknis),
-      aktivitas_id: kegiatan.aktivitas_id || getAktivitasIdByName(kegiatan.nama_aktivitas),
+      aktivitas_id:
+        kegiatan.aktivitas_id || getAktivitasIdByName(kegiatan.nama_aktivitas),
       survei_id: kegiatan.survei_id || getSurveiIdByName(kegiatan.nama_survei),
     });
     setIsEditModalOpen(true);
@@ -132,32 +139,41 @@ export default function DataKegiatanPage() {
       });
 
       // Get the updated names
-      const updatedTeknis = teknisList.find(t => t.id === Number(editingKegiatan.teknis_id));
-      const updatedAktivitas = aktivitasList.find(a => a.id === Number(editingKegiatan.aktivitas_id));
-      const updatedSurvei = surveiList.find(s => s.id === Number(editingKegiatan.survei_id));
+      const updatedTeknis = teknisList.find(
+        (t) => t.id === Number(editingKegiatan.teknis_id),
+      );
+      const updatedAktivitas = aktivitasList.find(
+        (a) => a.id === Number(editingKegiatan.aktivitas_id),
+      );
+      const updatedSurvei = surveiList.find(
+        (s) => s.id === Number(editingKegiatan.survei_id),
+      );
 
       // Update kegiatan state with complete data
-      setKegiatanList(kegiatanList.map(kegiatan => 
-        kegiatan.id === editingKegiatan.id 
-          ? { 
-              ...kegiatan,
-              teknis_id: Number(editingKegiatan.teknis_id),
-              aktivitas_id: Number(editingKegiatan.aktivitas_id),
-              survei_id: Number(editingKegiatan.survei_id),
-              nama_teknis: updatedTeknis?.nama_teknis || kegiatan.nama_teknis,
-              nama_aktivitas: updatedAktivitas?.nama_aktivitas || kegiatan.nama_aktivitas,
-              nama_survei: updatedSurvei?.nama_survei || kegiatan.nama_survei,
-              // Include other fields from response if available
-              ...(response.data?.data || {})
-            }
-          : kegiatan
-      ));
+      setKegiatanList(
+        kegiatanList.map((kegiatan) =>
+          kegiatan.id === editingKegiatan.id
+            ? {
+                ...kegiatan,
+                teknis_id: Number(editingKegiatan.teknis_id),
+                aktivitas_id: Number(editingKegiatan.aktivitas_id),
+                survei_id: Number(editingKegiatan.survei_id),
+                nama_teknis: updatedTeknis?.nama_teknis || kegiatan.nama_teknis,
+                nama_aktivitas:
+                  updatedAktivitas?.nama_aktivitas || kegiatan.nama_aktivitas,
+                nama_survei: updatedSurvei?.nama_survei || kegiatan.nama_survei,
+                // Include other fields from response if available
+                ...(response.data?.data || {}),
+              }
+            : kegiatan,
+        ),
+      );
 
       showSuccess("Data kegiatan berhasil diperbarui!");
       setIsEditModalOpen(false);
       setEditingKegiatan(null);
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal memperbarui data kegiatan.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal memperbarui data kegiatan."));
     } finally {
       setIsSubmitting(false);
     }
@@ -170,17 +186,17 @@ export default function DataKegiatanPage() {
 
   // Helper functions to get IDs by name (fallback if IDs are not provided)
   const getTeknisIdByName = (name: string) => {
-    const teknisData = teknisList.find(t => t.nama_teknis === name);
+    const teknisData = teknisList.find((t) => t.nama_teknis === name);
     return teknisData?.id || "";
   };
 
   const getAktivitasIdByName = (name: string) => {
-    const aktivitasData = aktivitasList.find(a => a.nama_aktivitas === name);
+    const aktivitasData = aktivitasList.find((a) => a.nama_aktivitas === name);
     return aktivitasData?.id || "";
   };
 
   const getSurveiIdByName = (name: string) => {
-    const surveiData = surveiList.find(s => s.nama_survei === name);
+    const surveiData = surveiList.find((s) => s.nama_survei === name);
     return surveiData?.id || "";
   };
 
@@ -199,8 +215,10 @@ export default function DataKegiatanPage() {
   const currentData = filteredData.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => setCurrentPage(page);
-  const handlePrevious = () => currentPage > 1 && setCurrentPage(currentPage - 1);
-  const handleNext = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const handlePrevious = () =>
+    currentPage > 1 && setCurrentPage(currentPage - 1);
+  const handleNext = () =>
+    currentPage < totalPages && setCurrentPage(currentPage + 1);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-white pt-24 px-6 pb-4">
@@ -230,7 +248,9 @@ export default function DataKegiatanPage() {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg px-4 py-2 shadow-sm">
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-[#30387B] rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-gray-700">Total Data:</span>
+            <span className="text-sm font-medium text-gray-700">
+              Total Data:
+            </span>
             <span className="bg-[#30387B] text-white text-sm font-bold px-3 py-1 rounded-full min-w-[40px] text-center">
               {filteredData.length}
             </span>
@@ -255,7 +275,10 @@ export default function DataKegiatanPage() {
           <tbody>
             {currentData.length > 0 ? (
               currentData.map((item, index) => (
-                <tr key={item.id} className="border-b hover:bg-gray-50 transition-colors text-center">
+                <tr
+                  key={item.id}
+                  className="border-b hover:bg-gray-50 transition-colors text-center"
+                >
                   <td className="px-4 py-3">{startIndex + index + 1}</td>
                   <td className="px-4 py-3">{item.nama_teknis}</td>
                   <td className="px-4 py-3">{item.nama_aktivitas}</td>
@@ -282,18 +305,27 @@ export default function DataKegiatanPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="text-center py-6 text-gray-500 italic">
-                  {kegiatanList.length === 0 ? "Data kegiatan kosong." : "Tidak ada hasil pencarian."}
+                <td
+                  colSpan={5}
+                  className="text-center py-6 text-gray-500 italic"
+                >
+                  {kegiatanList.length === 0
+                    ? "Data kegiatan kosong."
+                    : "Tidak ada hasil pencarian."}
                 </td>
               </tr>
             )}
 
             {currentData.length < itemsPerPage &&
-              Array.from({ length: itemsPerPage - currentData.length }).map((_, i) => (
-                <tr key={`empty-${i}`}>
-                  <td colSpan={5} className="py-4">&nbsp;</td>
-                </tr>
-              ))}
+              Array.from({ length: itemsPerPage - currentData.length }).map(
+                (_, i) => (
+                  <tr key={`empty-${i}`}>
+                    <td colSpan={5} className="py-4">
+                      &nbsp;
+                    </td>
+                  </tr>
+                ),
+              )}
           </tbody>
         </table>
       </div>
@@ -313,7 +345,9 @@ export default function DataKegiatanPage() {
         <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-800">Edit Data Kegiatan</h2>
+              <h2 className="text-xl font-bold text-gray-800">
+                Edit Data Kegiatan
+              </h2>
               <button
                 onClick={closeEditModal}
                 className="text-gray-400 hover:text-gray-600 transition"
@@ -331,10 +365,13 @@ export default function DataKegiatanPage() {
                 </label>
                 <select
                   value={editingKegiatan.teknis_id}
-                  onChange={(e) => setEditingKegiatan({
-                    ...editingKegiatan,
-                    teknis_id: e.target.value === '' ? '' : Number(e.target.value)
-                  })}
+                  onChange={(e) =>
+                    setEditingKegiatan({
+                      ...editingKegiatan,
+                      teknis_id:
+                        e.target.value === "" ? "" : Number(e.target.value),
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   required
                   disabled={isSubmitting}
@@ -355,10 +392,13 @@ export default function DataKegiatanPage() {
                 </label>
                 <select
                   value={editingKegiatan.aktivitas_id}
-                  onChange={(e) => setEditingKegiatan({
-                    ...editingKegiatan,
-                    aktivitas_id: e.target.value === '' ? '' : Number(e.target.value)
-                  })}
+                  onChange={(e) =>
+                    setEditingKegiatan({
+                      ...editingKegiatan,
+                      aktivitas_id:
+                        e.target.value === "" ? "" : Number(e.target.value),
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   required
                   disabled={isSubmitting}
@@ -366,7 +406,7 @@ export default function DataKegiatanPage() {
                   <option value="">Pilih Aktivitas</option>
                   {aktivitasList.map((aktivitas) => (
                     <option key={aktivitas.id} value={aktivitas.id}>
-                      {aktivitas.nama_aktivitas} 
+                      {aktivitas.nama_aktivitas}
                     </option>
                   ))}
                 </select>
@@ -379,10 +419,13 @@ export default function DataKegiatanPage() {
                 </label>
                 <select
                   value={editingKegiatan.survei_id}
-                  onChange={(e) => setEditingKegiatan({
-                    ...editingKegiatan,
-                    survei_id: e.target.value === '' ? '' : Number(e.target.value)
-                  })}
+                  onChange={(e) =>
+                    setEditingKegiatan({
+                      ...editingKegiatan,
+                      survei_id:
+                        e.target.value === "" ? "" : Number(e.target.value),
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   required
                   disabled={isSubmitting}
@@ -390,7 +433,7 @@ export default function DataKegiatanPage() {
                   <option value="">Pilih Survei</option>
                   {surveiList.map((survei) => (
                     <option key={survei.id} value={survei.id}>
-                      {survei.nama_survei} 
+                      {survei.nama_survei}
                     </option>
                   ))}
                 </select>

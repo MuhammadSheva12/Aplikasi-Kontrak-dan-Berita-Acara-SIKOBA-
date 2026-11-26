@@ -51,10 +51,13 @@ export default function DataMitraSobatPage() {
       setError(null);
       const res = await axios.get("/mitra/sobat");
       setData(res.data?.data || res.data || []);
-    } catch (error: any) {
-      if (error.response?.status === 401 || error.response?.status === 403) return;
+    } catch (error) {
+      if (error.response?.status === 401 || error.response?.status === 403)
+        return;
       if (error.response) {
-        setError(`Error ${error.response.status}: ${error.response.data.message || "Server error"}`);
+        setError(
+          `Error ${error.response.status}: ${error.response.data.message || "Server error"}`,
+        );
       } else if (error.request) {
         setError("No response from server. Check your connection.");
       } else {
@@ -72,8 +75,8 @@ export default function DataMitraSobatPage() {
       await axios.delete(`/mitra/sobat/${id}`);
       showSuccess("Data mitra berhasil dihapus!");
       setData(data.filter((item) => item.id !== id));
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal menghapus data, coba lagi.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal menghapus data, coba lagi."));
     }
   };
 
@@ -102,25 +105,27 @@ export default function DataMitraSobatPage() {
       });
 
       // Update data state with the updated mitra
-      setData(data.map(item => 
-        item.id === editingMitra.id 
-          ? { 
-              ...item,
-              nomor_mitra: editingMitra.nomor_mitra,
-              nama: editingMitra.nama,
-              nik: editingMitra.nik,
-              alamat: editingMitra.alamat,
-              // Include other fields from response if available
-              ...(response.data?.data || {})
-            }
-          : item
-      ));
+      setData(
+        data.map((item) =>
+          item.id === editingMitra.id
+            ? {
+                ...item,
+                nomor_mitra: editingMitra.nomor_mitra,
+                nama: editingMitra.nama,
+                nik: editingMitra.nik,
+                alamat: editingMitra.alamat,
+                // Include other fields from response if available
+                ...(response.data?.data || {}),
+              }
+            : item,
+        ),
+      );
 
       showSuccess("Data mitra berhasil diperbarui!");
       setIsEditModalOpen(false);
       setEditingMitra(null);
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal memperbarui data mitra.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal memperbarui data mitra."));
     } finally {
       setIsSubmitting(false);
     }
@@ -147,12 +152,16 @@ export default function DataMitraSobatPage() {
   const currentData = filteredData.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => setCurrentPage(page);
-  const handlePrevious = () => currentPage > 1 && setCurrentPage(currentPage - 1);
-  const handleNext = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const handlePrevious = () =>
+    currentPage > 1 && setCurrentPage(currentPage - 1);
+  const handleNext = () =>
+    currentPage < totalPages && setCurrentPage(currentPage + 1);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-white pt-24 px-6 pb-4">
-      <h1 className="text-2xl font-bold text-blue-950 mb-4">Data Mitra SOBAT</h1>
+      <h1 className="text-2xl font-bold text-blue-950 mb-4">
+        Data Mitra SOBAT
+      </h1>
 
       <div className="flex justify-between items-center flex-wrap gap-4 mb-4">
         <div className="flex items-center gap-4 flex-wrap">
@@ -178,7 +187,9 @@ export default function DataMitraSobatPage() {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg px-4 py-2 shadow-sm">
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-[#30387B] rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-gray-700">Total Data:</span>
+            <span className="text-sm font-medium text-gray-700">
+              Total Data:
+            </span>
             <span className="bg-[#30387B] text-white text-sm font-bold px-3 py-1 rounded-full min-w-[40px] text-center">
               {filteredData.length}
             </span>
@@ -204,7 +215,10 @@ export default function DataMitraSobatPage() {
           <tbody>
             {currentData.length > 0 ? (
               currentData.map((item, index) => (
-                <tr key={item.id} className="border-b hover:bg-gray-50 transition-colors text-center">
+                <tr
+                  key={item.id}
+                  className="border-b hover:bg-gray-50 transition-colors text-center"
+                >
                   <td className="px-4 py-3">{startIndex + index + 1}</td>
                   <td className="px-4 py-3">{item.nomor_mitra}</td>
                   <td className="px-4 py-3">{item.nama}</td>
@@ -232,18 +246,27 @@ export default function DataMitraSobatPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="text-center py-6 text-gray-500 italic">
-                  {data.length === 0 ? "Data mitra kosong." : "Tidak ada hasil pencarian."}
+                <td
+                  colSpan={6}
+                  className="text-center py-6 text-gray-500 italic"
+                >
+                  {data.length === 0
+                    ? "Data mitra kosong."
+                    : "Tidak ada hasil pencarian."}
                 </td>
               </tr>
             )}
 
             {currentData.length < itemsPerPage &&
-              Array.from({ length: itemsPerPage - currentData.length }).map((_, i) => (
-                <tr key={`empty-${i}`}>
-                  <td colSpan={6} className="py-4">&nbsp;</td>
-                </tr>
-              ))}
+              Array.from({ length: itemsPerPage - currentData.length }).map(
+                (_, i) => (
+                  <tr key={`empty-${i}`}>
+                    <td colSpan={6} className="py-4">
+                      &nbsp;
+                    </td>
+                  </tr>
+                ),
+              )}
           </tbody>
         </table>
       </div>
@@ -263,7 +286,9 @@ export default function DataMitraSobatPage() {
         <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-800">Edit Mitra SOBAT</h2>
+              <h2 className="text-xl font-bold text-gray-800">
+                Edit Mitra SOBAT
+              </h2>
               <button
                 onClick={closeEditModal}
                 className="text-gray-400 hover:text-gray-600 transition"
@@ -282,7 +307,12 @@ export default function DataMitraSobatPage() {
                 <input
                   type="text"
                   value={editingMitra.nomor_mitra}
-                  onChange={(e) => setEditingMitra({ ...editingMitra, nomor_mitra: e.target.value })}
+                  onChange={(e) =>
+                    setEditingMitra({
+                      ...editingMitra,
+                      nomor_mitra: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   placeholder="Masukkan nomor mitra"
                   required
@@ -298,7 +328,9 @@ export default function DataMitraSobatPage() {
                 <input
                   type="text"
                   value={editingMitra.nama}
-                  onChange={(e) => setEditingMitra({ ...editingMitra, nama: e.target.value })}
+                  onChange={(e) =>
+                    setEditingMitra({ ...editingMitra, nama: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   placeholder="Masukkan nama lengkap"
                   required
@@ -314,7 +346,9 @@ export default function DataMitraSobatPage() {
                 <input
                   type="text"
                   value={editingMitra.nik}
-                  onChange={(e) => setEditingMitra({ ...editingMitra, nik: e.target.value })}
+                  onChange={(e) =>
+                    setEditingMitra({ ...editingMitra, nik: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   placeholder="Masukkan NIK (16 digit)"
                   maxLength={16}
@@ -331,7 +365,9 @@ export default function DataMitraSobatPage() {
                 </label>
                 <textarea
                   value={editingMitra.alamat}
-                  onChange={(e) => setEditingMitra({ ...editingMitra, alamat: e.target.value })}
+                  onChange={(e) =>
+                    setEditingMitra({ ...editingMitra, alamat: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black resize-none"
                   placeholder="Masukkan alamat lengkap"
                   rows={3}

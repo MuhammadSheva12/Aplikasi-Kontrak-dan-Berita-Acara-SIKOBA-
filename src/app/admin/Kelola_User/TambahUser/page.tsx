@@ -74,7 +74,7 @@ export default function TambahUser() {
     setIsLoading(true);
     try {
       const selectedPegawai = pegawaiOptions.find(
-        (p) => p.id.toString() === data.nama_pegawai
+        (p) => p.id.toString() === data.nama_pegawai,
       );
 
       const payload = {
@@ -96,9 +96,9 @@ export default function TambahUser() {
       });
       router.push(
         "/admin/Kelola_User?status=success&message=" +
-          encodeURIComponent("User berhasil ditambahkan!")
+          encodeURIComponent("User berhasil ditambahkan!"),
       );
-    } catch (error: any) {
+    } catch (error) {
       const msg =
         error.response?.data?.message ||
         error.response?.data?.error ||
@@ -112,9 +112,7 @@ export default function TambahUser() {
 
   return (
     <div className="min-h-screen bg-white pt-28 px-8">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">
-        Data User
-      </h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Data User</h1>
       <h2 className="inline-block bg-[#30387B] text-white px-5 py-2 rounded mb-6">
         Form Tambah User
       </h2>
@@ -259,6 +257,6 @@ const SelectField = React.forwardRef<HTMLSelectElement, SelectFieldProps>(
       </select>
       {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
     </div>
-  )
+  ),
 );
 SelectField.displayName = "SelectField";

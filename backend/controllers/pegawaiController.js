@@ -30,12 +30,12 @@ const getPegawai = async (req, res) => {
 };
 
 const createNewPegawai = async (req, res) => {
-  const { nama_pegawai, nip, jabatan } = req.body;
-  if (!nama_pegawai || !nip || !jabatan) {
+  const { nama, nip, jabatan } = req.body;
+  if (!nama || !nip || !jabatan) {
     return res.status(400).json({ message: "Data tidak lengkap" });
   }
   try {
-    await createPegawai({ nama_pegawai, nip, jabatan });
+    await createPegawai({ nama, nip, jabatan });
     res.status(201).json({ message: "Data pegawai berhasil ditambahkan" });
   } catch (err) {
     console.error("Error in createNewPegawai:", err);
@@ -45,9 +45,9 @@ const createNewPegawai = async (req, res) => {
 
 const updatePegawaiById = async (req, res) => {
   const { id } = req.params;
-  const { nama_pegawai, nip, jabatan } = req.body;
+  const { nama, nip, jabatan } = req.body;
   try {
-    await updatePegawai(id, { nama_pegawai, nip, jabatan });
+    await updatePegawai(id, { nama, nip, jabatan });
     res.json({ message: "Data pegawai berhasil diperbarui" });
   } catch (err) {
     console.error("Error in updatePegawaiById:", err);

@@ -39,15 +39,14 @@ export default function TambahMitraSobat() {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      await axios.post("/mitra/sobat", data, {
-      });
+      await axios.post("/mitra/sobat", data, {});
 
       reset();
       router.push(
         "/admin/Mitra_Sobat?status=success&message=" +
-          encodeURIComponent("Data berhasil ditambahkan!")
+          encodeURIComponent("Data berhasil ditambahkan!"),
       );
-    } catch (error: any) {
+    } catch (error) {
       const msg =
         error.response?.data?.message ||
         error.response?.data?.error ||

@@ -6,7 +6,7 @@ import {
   Home, FileText, Users, Clipboard, Layout, Briefcase, Edit,
   Settings, Database, LogOut, Activity, Receipt, Newspaper, ChevronRight
 } from "lucide-react";
-import axios from "@/app/utils/axiosAPI"; // ✅ Panggil instance axios yang benar
+import axios from "@/app/utils/axiosAPI";
 
 export default function Sidebar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; toggleSidebar: () => void }) {
   const pathname = usePathname();
@@ -18,6 +18,7 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }: { sidebarOpen: b
   const [openMitra, setOpenMitra] = useState(false);
   const [openUmum, setOpenUmum] = useState(false);
   const [openSurat, setOpenSurat] = useState(false);
+  const [openTemplate, setOpenTemplate] = useState(false); // ✅ tambahan untuk Data Template
 
   useEffect(() => {
     const fetchRole = async () => {
@@ -28,7 +29,7 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }: { sidebarOpen: b
         setRole(response.data.role || "");
       } catch (error) {
         console.error("Gagal mengambil role:", error);
-        setRole(""); // fallback ke user
+        setRole("");
       } finally {
         setIsLoading(false);
       }
@@ -41,6 +42,7 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }: { sidebarOpen: b
     setOpenMitra(false);
     setOpenUmum(false);
     setOpenSurat(false);
+    setOpenTemplate(false); // ✅ reset ketika pindah halaman
   }, [pathname]);
 
   const isActive = (path: string) => pathname === path;
@@ -50,13 +52,13 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }: { sidebarOpen: b
     { name: "Data User", path: "/admin/Kelola_User", icon: Users },
     { name: "Data Pejabat & DIPA", path: "/admin/pejabat_dan_DIPA", icon: Clipboard },
     { name: "Data Kegiatan", path: "/admin/Data_Kegiatan", icon: Activity },
-    { name: "Data Template", path: "/admin/Template", icon: Layout },
+    // ❌ dihapus Data Template tunggal
   ];
 
   const userLinks = [
     { name: "Beranda", path: "/user/dashboard", icon: Home },
-    { name: "Daftar Kontrak", path: "/user/surat_kontrak", icon: Receipt },
-    { name: "Daftar BAST", path: "/user/berita_acara", icon: Newspaper },
+    { name: "Buat Surat Kontrak", path: "/user/data_kontrak", icon: Newspaper },
+    { name: "Buat Surat BAST", path: "/user/data_bast", icon: Newspaper },
   ];
 
   const handleNavigation = (path: string) => {
@@ -85,7 +87,11 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }: { sidebarOpen: b
   return (
     <>
       {sidebarOpen && <div className="fixed inset-0 bg-black/40 z-30" onClick={toggleSidebar} />}
-      <aside className={`fixed top-[80px] left-0 h-[calc(100%-80px)] w-64 bg-[#30387B] text-white z-30 transform transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <aside
+        className={`fixed top-[80px] left-0 h-[calc(100%-80px)] w-64 bg-[#30387B] text-white z-30 transform transition-transform duration-300 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <nav className="flex flex-col space-y-1 overflow-y-auto h-full px-3 py-4 hide-scrollbar">
           {(role === "admin" ? adminLinks : userLinks).map((item) => (
             <div key={item.path}>{renderLink(item.name, item.path, item.icon)}</div>
@@ -95,11 +101,27 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }: { sidebarOpen: b
           {role === "admin" && (
             <>
               <CollapsibleSection
+                title="Data Template"
+                icon={Layout}
+                open={openTemplate}
+                setOpen={setOpenTemplate}
+                links={[
+                  { name: "Template Kontrak", path: "/admin/Template_Kontrak", icon: FileText },
+                  { name: "Template BAST", path: "/admin/Template_BAST", icon: FileText },
+                ]}
+                isActive={isActive}
+                handleNavigation={handleNavigation}
+              />
+
+              <CollapsibleSection
                 title="Data Daftar Surat"
                 icon={FileText}
                 open={openSurat}
                 setOpen={setOpenSurat}
-                links={[{ name: "Kontrak & BAST", path: "/admin/Daftar_Kontrak_dan_BAST", icon: FileText }]}
+                links={[
+                  { name: "kontrak", path: "/admin/Daftar_Surat/kontrak", icon: FileText },
+                  { name: "bast", path: "/admin/Daftar_Surat/bast", icon: FileText }
+                ]}
                 isActive={isActive}
                 handleNavigation={handleNavigation}
               />
@@ -152,7 +174,7 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }: { sidebarOpen: b
   );
 }
 
-// Komponen untuk section dropdown
+// Komponen CollapsibleSection tetap sama
 function CollapsibleSection({
   title,
   icon: Icon,

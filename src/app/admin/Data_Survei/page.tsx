@@ -31,7 +31,9 @@ export default function DataSurveiPage() {
   const itemsPerPage = 6;
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingSurvei, setEditingSurvei] = useState<EditDataSurvei | null>(null);
+  const [editingSurvei, setEditingSurvei] = useState<EditDataSurvei | null>(
+    null,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -48,10 +50,13 @@ export default function DataSurveiPage() {
       setError(null);
       const res = await axios.get("/survei");
       setData(res.data?.data || res.data || []);
-    } catch (error: any) {
-      if (error.response?.status === 401 || error.response?.status === 403) return;
+    } catch (error) {
+      if (error.response?.status === 401 || error.response?.status === 403)
+        return;
       if (error.response) {
-        setError(`Error ${error.response.status}: ${error.response.data.message || "Server error"}`);
+        setError(
+          `Error ${error.response.status}: ${error.response.data.message || "Server error"}`,
+        );
       } else if (error.request) {
         setError("No response from server. Check your connection.");
       } else {
@@ -69,8 +74,8 @@ export default function DataSurveiPage() {
       await axios.delete(`/survei/${id}`);
       showSuccess("Data survei berhasil dihapus!");
       setData(data.filter((item) => item.id !== id));
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal menghapus data, coba lagi.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal menghapus data, coba lagi."));
     }
   };
 
@@ -94,21 +99,23 @@ export default function DataSurveiPage() {
         nama_survei: editingSurvei.nama_survei,
       });
 
-      setData(data.map(item =>
-        item.id === editingSurvei.id
-          ? {
-              ...item,
-              nama_survei: editingSurvei.nama_survei,
-              ...(response.data?.data || {})
-            }
-          : item
-      ));
+      setData(
+        data.map((item) =>
+          item.id === editingSurvei.id
+            ? {
+                ...item,
+                nama_survei: editingSurvei.nama_survei,
+                ...(response.data?.data || {}),
+              }
+            : item,
+        ),
+      );
 
       showSuccess("Data survei berhasil diperbarui!");
       setIsEditModalOpen(false);
       setEditingSurvei(null);
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal memperbarui data.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal memperbarui data."));
     } finally {
       setIsSubmitting(false);
     }
@@ -120,7 +127,7 @@ export default function DataSurveiPage() {
   };
 
   const filteredData = data.filter((item) =>
-    item.nama_survei.toLowerCase().includes(searchTerm.toLowerCase())
+    item.nama_survei.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -129,8 +136,10 @@ export default function DataSurveiPage() {
   const currentData = filteredData.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => setCurrentPage(page);
-  const handlePrevious = () => currentPage > 1 && setCurrentPage(currentPage - 1);
-  const handleNext = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const handlePrevious = () =>
+    currentPage > 1 && setCurrentPage(currentPage - 1);
+  const handleNext = () =>
+    currentPage < totalPages && setCurrentPage(currentPage + 1);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-white pt-24 px-6 pb-4">
@@ -160,7 +169,9 @@ export default function DataSurveiPage() {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg px-4 py-2 shadow-sm">
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-[#30387B] rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-gray-700">Total Data:</span>
+            <span className="text-sm font-medium text-gray-700">
+              Total Data:
+            </span>
             <span className="bg-[#30387B] text-white text-sm font-bold px-3 py-1 rounded-full min-w-[40px] text-center">
               {filteredData.length}
             </span>
@@ -230,7 +241,7 @@ export default function DataSurveiPage() {
                       &nbsp;
                     </td>
                   </tr>
-                )
+                ),
               )}
           </tbody>
         </table>
@@ -251,7 +262,9 @@ export default function DataSurveiPage() {
         <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-800">Edit Data Survei</h2>
+              <h2 className="text-xl font-bold text-gray-800">
+                Edit Data Survei
+              </h2>
               <button
                 onClick={closeEditModal}
                 className="text-gray-400 hover:text-gray-600 transition"
@@ -270,10 +283,12 @@ export default function DataSurveiPage() {
                 <input
                   type="text"
                   value={editingSurvei.nama_survei}
-                  onChange={(e) => setEditingSurvei({
-                    ...editingSurvei,
-                    nama_survei: e.target.value,
-                  })}
+                  onChange={(e) =>
+                    setEditingSurvei({
+                      ...editingSurvei,
+                      nama_survei: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   placeholder="Masukkan nama survei"
                   required

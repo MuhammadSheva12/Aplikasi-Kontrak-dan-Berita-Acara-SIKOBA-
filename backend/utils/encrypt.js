@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const key = process.env.AES_SECRET_KEY; // Pastikan key ini panjangnya 32 karakter (256 bit)
+const key = process.env.AES_SECRET_KEY; 
 
 function encrypt(text) {
   const iv = crypto.randomBytes(16); // IV (inisialisasi vector) random 16 bytes

@@ -33,7 +33,9 @@ export default function DataTeknisPage() {
   const itemsPerPage = 6;
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingTeknis, setEditingTeknis] = useState<EditDataTeknis | null>(null);
+  const [editingTeknis, setEditingTeknis] = useState<EditDataTeknis | null>(
+    null,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -50,14 +52,14 @@ export default function DataTeknisPage() {
       setError(null);
       const res = await axios.get("/teknis");
       setData(res.data?.data || res.data || []);
-    } catch (error: any) {
+    } catch (error) {
       if (error.response?.status === 401 || error.response?.status === 403)
         return;
       if (error.response) {
         setError(
           `Error ${error.response.status}: ${
             error.response.data.message || "Server error"
-          }`
+          }`,
         );
       } else if (error.request) {
         setError("No response from server. Check your connection.");
@@ -76,10 +78,8 @@ export default function DataTeknisPage() {
       await axios.delete(`/teknis/${id}`);
       showSuccess("Data teknis berhasil dihapus!");
       setData(data.filter((item) => item.id !== id));
-    } catch (error: any) {
-      showError(
-        error.response?.data?.message || "Gagal menghapus data, coba lagi."
-      );
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal menghapus data, coba lagi."));
     }
   };
 
@@ -105,22 +105,24 @@ export default function DataTeknisPage() {
         kode_teknis: editingTeknis.kode_teknis,
       });
 
-      setData(data.map(item =>
-        item.id === editingTeknis.id
-          ? {
-              ...item,
-              nama_teknis: editingTeknis.nama_teknis,
-              kode_teknis: editingTeknis.kode_teknis, 
-              ...(response.data?.data || {})
-            }
-          : item
-      ));
+      setData(
+        data.map((item) =>
+          item.id === editingTeknis.id
+            ? {
+                ...item,
+                nama_teknis: editingTeknis.nama_teknis,
+                kode_teknis: editingTeknis.kode_teknis,
+                ...(response.data?.data || {}),
+              }
+            : item,
+        ),
+      );
 
       showSuccess("Data teknis berhasil diperbarui!");
       setIsEditModalOpen(false);
       setEditingTeknis(null);
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal memperbarui data.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal memperbarui data."));
     } finally {
       setIsSubmitting(false);
     }
@@ -145,8 +147,10 @@ export default function DataTeknisPage() {
   const currentData = filteredData.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => setCurrentPage(page);
-  const handlePrevious = () => currentPage > 1 && setCurrentPage(currentPage - 1);
-  const handleNext = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const handlePrevious = () =>
+    currentPage > 1 && setCurrentPage(currentPage - 1);
+  const handleNext = () =>
+    currentPage < totalPages && setCurrentPage(currentPage + 1);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-white pt-24 px-6 pb-4">
@@ -256,7 +260,7 @@ export default function DataTeknisPage() {
                       &nbsp;
                     </td>
                   </tr>
-                )
+                ),
               )}
           </tbody>
         </table>
@@ -277,7 +281,9 @@ export default function DataTeknisPage() {
         <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-800">Edit Data Teknis</h2>
+              <h2 className="text-xl font-bold text-gray-800">
+                Edit Data Teknis
+              </h2>
               <button
                 onClick={closeEditModal}
                 className="text-gray-400 hover:text-gray-600 transition"
@@ -296,10 +302,12 @@ export default function DataTeknisPage() {
                 <input
                   type="text"
                   value={editingTeknis.nama_teknis}
-                  onChange={(e) => setEditingTeknis({
-                    ...editingTeknis,
-                    nama_teknis: e.target.value,
-                  })}
+                  onChange={(e) =>
+                    setEditingTeknis({
+                      ...editingTeknis,
+                      nama_teknis: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   placeholder="Masukkan nama teknis"
                   required
@@ -315,10 +323,12 @@ export default function DataTeknisPage() {
                 <input
                   type="text"
                   value={editingTeknis.kode_teknis}
-                  onChange={(e) => setEditingTeknis({
-                    ...editingTeknis,
-                    kode_teknis: e.target.value,
-                  })}
+                  onChange={(e) =>
+                    setEditingTeknis({
+                      ...editingTeknis,
+                      kode_teknis: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   placeholder="Masukkan kode teknis"
                   required

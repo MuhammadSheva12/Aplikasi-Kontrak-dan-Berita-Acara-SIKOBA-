@@ -35,11 +35,12 @@ export default function TambahJabatanPetugas() {
       reset();
       router.push(
         "/admin/Jabatan_Petugas?status=success&message=" +
-          encodeURIComponent("Data berhasil ditambahkan!")
+          encodeURIComponent("Data berhasil ditambahkan!"),
       );
-    } catch (error: any) {
+    } catch (error) {
       const pesanError =
-        error.response?.data?.message || "Gagal menambahkan data jabatan petugas.";
+        error.response?.data?.message ||
+        "Gagal menambahkan data jabatan petugas.";
       showError(pesanError);
     } finally {
       setIsLoading(false);
@@ -49,7 +50,8 @@ export default function TambahJabatanPetugas() {
   return (
     <div className="pt-24 px-6 min-h-screen bg-white text-black">
       <h1 className="text-2xl font-bold text-blue-950 mb-4">
-        Data Jabatan Petugas</h1>
+        Data Jabatan Petugas
+      </h1>
       <h2 className="inline-block bg-[#30387B] text-white px-5 py-2 rounded mb-10">
         Form Tambah Jabatan Petugas
       </h2>
@@ -102,7 +104,13 @@ type InputProps = {
   error?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
-const Input = ({ label, placeholder, type = "text", error, ...rest }: InputProps) => {
+const Input = ({
+  label,
+  placeholder,
+  type = "text",
+  error,
+  ...rest
+}: InputProps) => {
   return (
     <div className="space-y-1">
       <label className="block text-sm font-medium text-gray-700">{label}</label>

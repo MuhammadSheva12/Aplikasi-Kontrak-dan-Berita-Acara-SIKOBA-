@@ -11,7 +11,7 @@ export default function useAuthCheck() {
   const checkAuth = useCallback(async () => {
     try {
       await axios.get("/auth/check", { withCredentials: true });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Auth check failed:", error);
 
       const status = error?.response?.status;

@@ -29,7 +29,9 @@ export default function DataSatuanPage() {
   const itemsPerPage = 6;
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingSatuan, setEditingSatuan] = useState<EditDataSatuan | null>(null);
+  const [editingSatuan, setEditingSatuan] = useState<EditDataSatuan | null>(
+    null,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -46,10 +48,13 @@ export default function DataSatuanPage() {
       setError(null);
       const res = await axios.get("/satuan");
       setData(res.data?.data || res.data || []);
-    } catch (error: any) {
-      if (error.response?.status === 401 || error.response?.status === 403) return;
+    } catch (error) {
+      if (error.response?.status === 401 || error.response?.status === 403)
+        return;
       if (error.response) {
-        setError(`Error ${error.response.status}: ${error.response.data.message || "Server error"}`);
+        setError(
+          `Error ${error.response.status}: ${error.response.data.message || "Server error"}`,
+        );
       } else if (error.request) {
         setError("No response from server. Check your connection.");
       } else {
@@ -67,8 +72,8 @@ export default function DataSatuanPage() {
       await axios.delete(`/satuan/${id}`);
       showSuccess("Data satuan berhasil dihapus!");
       setData(data.filter((item) => item.id !== id));
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal menghapus data.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal menghapus data."));
     }
   };
 
@@ -92,22 +97,24 @@ export default function DataSatuanPage() {
         uraian_status: editingSatuan.uraian_status,
       });
 
-      setData(data.map(item =>
-        item.id === editingSatuan.id
-          ? {
-              ...item,
-              uraian: editingSatuan.uraian,
-              uraian_status: editingSatuan.uraian_status,
-              ...(response.data?.data || {})
-            }
-          : item
-      ));
+      setData(
+        data.map((item) =>
+          item.id === editingSatuan.id
+            ? {
+                ...item,
+                uraian: editingSatuan.uraian,
+                uraian_status: editingSatuan.uraian_status,
+                ...(response.data?.data || {}),
+              }
+            : item,
+        ),
+      );
 
       showSuccess("Data satuan berhasil diperbarui!");
       setIsEditModalOpen(false);
       setEditingSatuan(null);
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal memperbarui data.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal memperbarui data."));
     } finally {
       setIsSubmitting(false);
     }
@@ -118,9 +125,10 @@ export default function DataSatuanPage() {
     setEditingSatuan(null);
   };
 
-  const filteredData = data.filter((item) =>
-    item.uraian.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.uraian_status.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredData = data.filter(
+    (item) =>
+      item.uraian.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.uraian_status.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -129,8 +137,10 @@ export default function DataSatuanPage() {
   const currentData = filteredData.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => setCurrentPage(page);
-  const handlePrevious = () => currentPage > 1 && setCurrentPage(currentPage - 1);
-  const handleNext = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const handlePrevious = () =>
+    currentPage > 1 && setCurrentPage(currentPage - 1);
+  const handleNext = () =>
+    currentPage < totalPages && setCurrentPage(currentPage + 1);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-white pt-24 px-6 pb-4">
@@ -160,7 +170,9 @@ export default function DataSatuanPage() {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg px-4 py-2 shadow-sm">
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-[#30387B] rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-gray-700">Total Data:</span>
+            <span className="text-sm font-medium text-gray-700">
+              Total Data:
+            </span>
             <span className="bg-[#30387B] text-white text-sm font-bold px-3 py-1 rounded-full min-w-[40px] text-center">
               {filteredData.length}
             </span>
@@ -177,14 +189,17 @@ export default function DataSatuanPage() {
             <tr>
               <th className="px-4 py-3 rounded-tl-xl">No</th>
               <th className="px-4 py-3">Uraian</th>
-              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Uraian Status</th>
               <th className="px-4 py-3 rounded-tr-xl">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {currentData.length > 0 ? (
               currentData.map((item, index) => (
-                <tr key={item.id} className="border-b hover:bg-gray-50 transition-colors text-center capitalize">
+                <tr
+                  key={item.id}
+                  className="border-b hover:bg-gray-50 transition-colors text-center capitalize"
+                >
                   <td className="px-4 py-3">{startIndex + index + 1}</td>
                   <td className="px-4 py-3">{item.uraian}</td>
                   <td className="px-4 py-3">{item.uraian_status}</td>
@@ -210,18 +225,27 @@ export default function DataSatuanPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="text-center py-6 text-gray-500 italic">
-                  {data.length === 0 ? "Data satuan kosong." : "Tidak ada hasil pencarian."}
+                <td
+                  colSpan={4}
+                  className="text-center py-6 text-gray-500 italic"
+                >
+                  {data.length === 0
+                    ? "Data satuan kosong."
+                    : "Tidak ada hasil pencarian."}
                 </td>
               </tr>
             )}
 
             {currentData.length < itemsPerPage &&
-              Array.from({ length: itemsPerPage - currentData.length }).map((_, i) => (
-                <tr key={`empty-${i}`}>
-                  <td colSpan={4} className="py-4">&nbsp;</td>
-                </tr>
-              ))}
+              Array.from({ length: itemsPerPage - currentData.length }).map(
+                (_, i) => (
+                  <tr key={`empty-${i}`}>
+                    <td colSpan={4} className="py-4">
+                      &nbsp;
+                    </td>
+                  </tr>
+                ),
+              )}
           </tbody>
         </table>
       </div>
@@ -241,7 +265,9 @@ export default function DataSatuanPage() {
         <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-800">Edit Data Satuan</h2>
+              <h2 className="text-xl font-bold text-gray-800">
+                Edit Data Satuan
+              </h2>
               <button
                 onClick={closeEditModal}
                 className="text-gray-400 hover:text-gray-600 transition"
@@ -260,10 +286,12 @@ export default function DataSatuanPage() {
                 <input
                   type="text"
                   value={editingSatuan.uraian}
-                  onChange={(e) => setEditingSatuan({
-                    ...editingSatuan,
-                    uraian: e.target.value,
-                  })}
+                  onChange={(e) =>
+                    setEditingSatuan({
+                      ...editingSatuan,
+                      uraian: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   placeholder="Masukkan uraian"
                   required
@@ -279,10 +307,12 @@ export default function DataSatuanPage() {
                 <input
                   type="text"
                   value={editingSatuan.uraian_status}
-                  onChange={(e) => setEditingSatuan({
-                    ...editingSatuan,
-                    uraian_status: e.target.value,
-                  })}
+                  onChange={(e) =>
+                    setEditingSatuan({
+                      ...editingSatuan,
+                      uraian_status: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   placeholder="Masukkan status"
                   required

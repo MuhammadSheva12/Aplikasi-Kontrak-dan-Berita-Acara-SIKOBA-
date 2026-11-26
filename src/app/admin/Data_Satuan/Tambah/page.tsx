@@ -10,7 +10,7 @@ import axios from "@/app/utils/axiosAPI";
 
 const satuanSchema = z.object({
   uraian: z.string().min(1, "Uraian wajib diisi"),
-  status: z.string().min(1, "Status wajib diisi"),
+  uraian_status: z.string().min(1, "Uraian Status wajib diisi"),
 });
 
 type FormData = z.infer<typeof satuanSchema>;
@@ -36,7 +36,7 @@ export default function TambahSatuan() {
       reset();
       showSuccess("Data satuan berhasil ditambahkan!");
       router.push("/admin/Data_Satuan");
-    } catch (error: any) {
+    } catch (error) {
       const msg =
         error.response?.data?.message ||
         error.message ||
@@ -49,9 +49,7 @@ export default function TambahSatuan() {
 
   return (
     <div className="pt-24 px-6 min-h-screen bg-white">
-      <h1 className="text-2xl font-bold text-blue-950 mb-4">
-        Data Satuan
-      </h1>
+      <h1 className="text-2xl font-bold text-blue-950 mb-4">Data Satuan</h1>
 
       <h2 className="inline-block bg-[#30387B] text-white px-5 py-2 rounded mb-10">
         Form Tambah Data Satuan
@@ -68,8 +66,8 @@ export default function TambahSatuan() {
             <Input
               label="Status"
               placeholder="Isi status"
-              {...register("status")}
-              error={errors.status?.message}
+              {...register("uraian_status")}
+              error={errors.uraian_status?.message}
             />
           </div>
         </div>

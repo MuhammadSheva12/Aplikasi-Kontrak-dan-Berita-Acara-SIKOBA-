@@ -27,7 +27,7 @@ export default function LoginPage() {
       } else {
         router.push("/user/dashboard");
       }
-    } catch (err: any) {
+    } catch (err) {
       const errorMessage =
         err.response?.data?.message ||
         err.message ||

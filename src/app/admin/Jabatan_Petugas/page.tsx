@@ -29,7 +29,8 @@ export default function DataJabatanPetugasPage() {
   const itemsPerPage = 6;
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingJabatan, setEditingJabatan] = useState<EditJabatanPetugas | null>(null);
+  const [editingJabatan, setEditingJabatan] =
+    useState<EditJabatanPetugas | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -46,10 +47,13 @@ export default function DataJabatanPetugasPage() {
       setError(null);
       const res = await axios.get("/jabatan_petugas");
       setData(res.data?.data || res.data || []);
-    } catch (error: any) {
-      if (error.response?.status === 401 || error.response?.status === 403) return;
+    } catch (error) {
+      if (error.response?.status === 401 || error.response?.status === 403)
+        return;
       if (error.response) {
-        setError(`Error ${error.response.status}: ${error.response.data.message || "Server error"}`);
+        setError(
+          `Error ${error.response.status}: ${error.response.data.message || "Server error"}`,
+        );
       } else if (error.request) {
         setError("No response from server. Check your connection.");
       } else {
@@ -67,8 +71,8 @@ export default function DataJabatanPetugasPage() {
       await axios.delete(`/jabatan_petugas/${id}`);
       showSuccess("Data jabatan berhasil dihapus!");
       setData(data.filter((item) => item.id !== id));
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal menghapus data, coba lagi.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal menghapus data, coba lagi."));
     }
   };
 
@@ -87,27 +91,32 @@ export default function DataJabatanPetugasPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await axios.put(`/jabatan_petugas/${editingJabatan.id}`, {
-        nama_jabatan: editingJabatan.nama_jabatan,
-        uraian: editingJabatan.uraian,
-      });
+      const response = await axios.put(
+        `/jabatan_petugas/${editingJabatan.id}`,
+        {
+          nama_jabatan: editingJabatan.nama_jabatan,
+          uraian: editingJabatan.uraian,
+        },
+      );
 
-      setData(data.map(item =>
-        item.id === editingJabatan.id
-          ? {
-              ...item,
-              nama_jabatan: editingJabatan.nama_jabatan,
-              uraian: editingJabatan.uraian,
-              ...(response.data?.data || {})
-            }
-          : item
-      ));
+      setData(
+        data.map((item) =>
+          item.id === editingJabatan.id
+            ? {
+                ...item,
+                nama_jabatan: editingJabatan.nama_jabatan,
+                uraian: editingJabatan.uraian,
+                ...(response.data?.data || {}),
+              }
+            : item,
+        ),
+      );
 
       showSuccess("Data jabatan berhasil diperbarui!");
       setIsEditModalOpen(false);
       setEditingJabatan(null);
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal memperbarui data.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal memperbarui data."));
     } finally {
       setIsSubmitting(false);
     }
@@ -118,9 +127,10 @@ export default function DataJabatanPetugasPage() {
     setEditingJabatan(null);
   };
 
-  const filteredData = data.filter((item) =>
-    item.nama_jabatan.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.uraian.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredData = data.filter(
+    (item) =>
+      item.nama_jabatan.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.uraian.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -129,12 +139,16 @@ export default function DataJabatanPetugasPage() {
   const currentData = filteredData.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => setCurrentPage(page);
-  const handlePrevious = () => currentPage > 1 && setCurrentPage(currentPage - 1);
-  const handleNext = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const handlePrevious = () =>
+    currentPage > 1 && setCurrentPage(currentPage - 1);
+  const handleNext = () =>
+    currentPage < totalPages && setCurrentPage(currentPage + 1);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-white pt-24 px-6 pb-4">
-      <h1 className="text-2xl font-bold text-blue-950 mb-4">Data Jabatan Petugas</h1>
+      <h1 className="text-2xl font-bold text-blue-950 mb-4">
+        Data Jabatan Petugas
+      </h1>
 
       <div className="flex justify-between items-center flex-wrap gap-4 mb-4">
         <div className="flex items-center gap-4 flex-wrap">
@@ -160,7 +174,9 @@ export default function DataJabatanPetugasPage() {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg px-4 py-2 shadow-sm">
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-[#30387B] rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-gray-700">Total Data:</span>
+            <span className="text-sm font-medium text-gray-700">
+              Total Data:
+            </span>
             <span className="bg-[#30387B] text-white text-sm font-bold px-3 py-1 rounded-full min-w-[40px] text-center">
               {filteredData.length}
             </span>
@@ -184,7 +200,10 @@ export default function DataJabatanPetugasPage() {
           <tbody>
             {currentData.length > 0 ? (
               currentData.map((item, index) => (
-                <tr key={item.id} className="border-b hover:bg-gray-50 transition-colors text-center capitalize">
+                <tr
+                  key={item.id}
+                  className="border-b hover:bg-gray-50 transition-colors text-center capitalize"
+                >
                   <td className="px-4 py-3">{startIndex + index + 1}</td>
                   <td className="px-4 py-3">{item.nama_jabatan}</td>
                   <td className="px-4 py-3">{item.uraian}</td>
@@ -210,18 +229,27 @@ export default function DataJabatanPetugasPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="text-center py-6 text-gray-500 italic">
-                  {data.length === 0 ? "Data jabatan kosong." : "Tidak ada hasil pencarian."}
+                <td
+                  colSpan={4}
+                  className="text-center py-6 text-gray-500 italic"
+                >
+                  {data.length === 0
+                    ? "Data jabatan kosong."
+                    : "Tidak ada hasil pencarian."}
                 </td>
               </tr>
             )}
 
             {currentData.length < itemsPerPage &&
-              Array.from({ length: itemsPerPage - currentData.length }).map((_, i) => (
-                <tr key={`empty-${i}`}>
-                  <td colSpan={4} className="py-4">&nbsp;</td>
-                </tr>
-              ))}
+              Array.from({ length: itemsPerPage - currentData.length }).map(
+                (_, i) => (
+                  <tr key={`empty-${i}`}>
+                    <td colSpan={4} className="py-4">
+                      &nbsp;
+                    </td>
+                  </tr>
+                ),
+              )}
           </tbody>
         </table>
       </div>
@@ -241,7 +269,9 @@ export default function DataJabatanPetugasPage() {
         <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-800">Edit Data Jabatan</h2>
+              <h2 className="text-xl font-bold text-gray-800">
+                Edit Data Jabatan
+              </h2>
               <button
                 onClick={closeEditModal}
                 className="text-gray-400 hover:text-gray-600 transition"
@@ -260,10 +290,12 @@ export default function DataJabatanPetugasPage() {
                 <input
                   type="text"
                   value={editingJabatan.nama_jabatan}
-                  onChange={(e) => setEditingJabatan({
-                    ...editingJabatan,
-                    nama_jabatan: e.target.value,
-                  })}
+                  onChange={(e) =>
+                    setEditingJabatan({
+                      ...editingJabatan,
+                      nama_jabatan: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   placeholder="Masukkan nama jabatan"
                   required
@@ -278,10 +310,12 @@ export default function DataJabatanPetugasPage() {
                 </label>
                 <textarea
                   value={editingJabatan.uraian}
-                  onChange={(e) => setEditingJabatan({
-                    ...editingJabatan,
-                    uraian: e.target.value,
-                  })}
+                  onChange={(e) =>
+                    setEditingJabatan({
+                      ...editingJabatan,
+                      uraian: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   placeholder="Masukkan uraian jabatan"
                   rows={3}

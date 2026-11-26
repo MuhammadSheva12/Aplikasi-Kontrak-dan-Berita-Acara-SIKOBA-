@@ -35,7 +35,9 @@ export default function DataPegawaiPage() {
   const itemsPerPage = 6;
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingPegawai, setEditingPegawai] = useState<EditPegawai | null>(null);
+  const [editingPegawai, setEditingPegawai] = useState<EditPegawai | null>(
+    null,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -52,10 +54,13 @@ export default function DataPegawaiPage() {
       setError(null);
       const res = await axios.get("/pegawai");
       setData(res.data?.data || res.data || []);
-    } catch (error: any) {
-      if (error.response?.status === 401 || error.response?.status === 403) return;
+    } catch (error) {
+      if (error.response?.status === 401 || error.response?.status === 403)
+        return;
       if (error.response) {
-        setError(`Error ${error.response.status}: ${error.response.data.message || "Server error"}`);
+        setError(
+          `Error ${error.response.status}: ${error.response.data.message || "Server error"}`,
+        );
       } else if (error.request) {
         setError("No response from server. Check your connection.");
       } else {
@@ -73,8 +78,8 @@ export default function DataPegawaiPage() {
       await axios.delete(`/pegawai/${id}`);
       showSuccess("Data pegawai berhasil dihapus!");
       setData(data.filter((item) => item.id !== id));
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal menghapus data, coba lagi.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal menghapus data, coba lagi."));
     }
   };
 
@@ -102,23 +107,25 @@ export default function DataPegawaiPage() {
         jabatan: editingPegawai.jabatan,
       });
 
-      setData(data.map(item =>
-        item.id === editingPegawai.id
-          ? {
-              ...item,
-              nama: editingPegawai.nama,
-              nip: editingPegawai.nip,
-              jabatan: editingPegawai.jabatan,
-              ...(response.data?.data || {})
-            }
-          : item
-      ));
+      setData(
+        data.map((item) =>
+          item.id === editingPegawai.id
+            ? {
+                ...item,
+                nama: editingPegawai.nama,
+                nip: editingPegawai.nip,
+                jabatan: editingPegawai.jabatan,
+                ...(response.data?.data || {}),
+              }
+            : item,
+        ),
+      );
 
       showSuccess("Data pegawai berhasil diperbarui!");
       setIsEditModalOpen(false);
       setEditingPegawai(null);
-    } catch (error: any) {
-      showError(error.response?.data?.message || "Gagal memperbarui data.");
+    } catch (error) {
+      showError(getErrorMessage(error, "Gagal memperbarui data."));
     } finally {
       setIsSubmitting(false);
     }
@@ -144,8 +151,10 @@ export default function DataPegawaiPage() {
   const currentData = filteredData.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => setCurrentPage(page);
-  const handlePrevious = () => currentPage > 1 && setCurrentPage(currentPage - 1);
-  const handleNext = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const handlePrevious = () =>
+    currentPage > 1 && setCurrentPage(currentPage - 1);
+  const handleNext = () =>
+    currentPage < totalPages && setCurrentPage(currentPage + 1);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-white pt-24 px-6 pb-4">
@@ -175,7 +184,9 @@ export default function DataPegawaiPage() {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg px-4 py-2 shadow-sm">
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-[#30387B] rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-gray-700">Total Data:</span>
+            <span className="text-sm font-medium text-gray-700">
+              Total Data:
+            </span>
             <span className="bg-[#30387B] text-white text-sm font-bold px-3 py-1 rounded-full min-w-[40px] text-center">
               {filteredData.length}
             </span>
@@ -249,7 +260,7 @@ export default function DataPegawaiPage() {
                       &nbsp;
                     </td>
                   </tr>
-                )
+                ),
               )}
           </tbody>
         </table>
@@ -270,7 +281,9 @@ export default function DataPegawaiPage() {
         <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-800">Edit Data Pegawai</h2>
+              <h2 className="text-xl font-bold text-gray-800">
+                Edit Data Pegawai
+              </h2>
               <button
                 onClick={closeEditModal}
                 className="text-gray-400 hover:text-gray-600 transition"
@@ -289,10 +302,12 @@ export default function DataPegawaiPage() {
                 <input
                   type="text"
                   value={editingPegawai.nama}
-                  onChange={(e) => setEditingPegawai({
-                    ...editingPegawai,
-                    nama: e.target.value,
-                  })}
+                  onChange={(e) =>
+                    setEditingPegawai({
+                      ...editingPegawai,
+                      nama: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   placeholder="Masukkan nama pegawai"
                   required
@@ -308,10 +323,12 @@ export default function DataPegawaiPage() {
                 <input
                   type="text"
                   value={editingPegawai.nip}
-                  onChange={(e) => setEditingPegawai({
-                    ...editingPegawai,
-                    nip: e.target.value,
-                  })}
+                  onChange={(e) =>
+                    setEditingPegawai({
+                      ...editingPegawai,
+                      nip: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   placeholder="Masukkan NIP pegawai"
                   required
@@ -327,10 +344,12 @@ export default function DataPegawaiPage() {
                 <input
                   type="text"
                   value={editingPegawai.jabatan}
-                  onChange={(e) => setEditingPegawai({
-                    ...editingPegawai,
-                    jabatan: e.target.value,
-                  })}
+                  onChange={(e) =>
+                    setEditingPegawai({
+                      ...editingPegawai,
+                      jabatan: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#30387B] text-black"
                   placeholder="Masukkan jabatan pegawai"
                   required
