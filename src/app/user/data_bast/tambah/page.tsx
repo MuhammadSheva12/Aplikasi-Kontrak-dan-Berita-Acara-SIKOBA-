@@ -1,9 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+  type InputHTMLAttributes,
+  type SelectHTMLAttributes,
+} from "react";
 import { useRouter } from "next/navigation";
 import axios from "@/app/utils/axiosAPI";
 import { showError, showSuccess } from "@/app/utils/toast";
+import { getErrorMessage } from "@/app/utils/getErrorMessage";
 
 interface Option {
   id: number;
@@ -74,7 +82,9 @@ export default function TambahBastPage() {
       .catch(() => showError("Gagal memuat data"));
   }, []);
 
-  const handleChange = (e: any) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -82,7 +92,7 @@ export default function TambahBastPage() {
   // ============================
   // SIMPAN SAJA
   // ============================
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     try {
@@ -114,7 +124,9 @@ export default function TambahBastPage() {
       const url = window.URL.createObjectURL(blob);
 
       let fileName = "bast.docx";
-      const disposition = res.headers["content-disposition"];
+      const disposition = res.headers["content-disposition"] as
+        | string
+        | undefined;
       if (disposition) {
         const match = disposition.match(/filename="(.+)"/);
         if (match?.[1]) fileName = match[1];
@@ -285,7 +297,10 @@ export default function TambahBastPage() {
 // ======================
 // INPUT FIELD
 // ======================
-const InputField = ({ label, ...rest }: any) => (
+const InputField = ({
+  label,
+  ...rest
+}: InputHTMLAttributes<HTMLInputElement> & { label: string }) => (
   <div>
     <label className="block text-sm font-medium mb-1 text-gray-700">
       {label}
@@ -300,7 +315,14 @@ const InputField = ({ label, ...rest }: any) => (
 // ======================
 // SELECT FIELD
 // ======================
-const SelectField = ({ label, options, ...rest }: any) => (
+const SelectField = ({
+  label,
+  options,
+  ...rest
+}: SelectHTMLAttributes<HTMLSelectElement> & {
+  label: string;
+  options: { value: string; label: string }[];
+}) => (
   <div>
     <label className="block text-sm font-medium mb-1 text-gray-700">
       {label}
@@ -312,7 +334,7 @@ const SelectField = ({ label, options, ...rest }: any) => (
       <option value="" disabled hidden>
         Pilih {label.toLowerCase()}
       </option>
-      {options.map((opt: any) => (
+      {options.map((opt) => (
         <option key={opt.value} value={opt.value}>
           {opt.label}
         </option>

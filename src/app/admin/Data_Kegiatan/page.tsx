@@ -7,6 +7,8 @@ import axios from "@/app/utils/axiosAPI";
 import SpinnerHalaman from "@/app/components/shared/SpinnerHalaman";
 import Pagination from "@/app/components/shared/Pagination";
 import { showSuccess, showError } from "@/app/utils/toast";
+import { isAxiosError } from "axios";
+import { getErrorMessage } from "@/app/utils/getErrorMessage";
 
 interface Teknis {
   id: number;
@@ -69,38 +71,41 @@ export default function DataKegiatanPage() {
   }, [searchTerm]);
 
   const fetchData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  try {
+    setLoading(true);
+    setError(null);
 
-      const [kegiatanRes, teknisRes, aktivitasRes, surveiRes] =
-        await Promise.all([
-          axios.get("/kegiatan"),
-          axios.get("/teknis"),
-          axios.get("/aktivitas"),
-          axios.get("/survei"),
-        ]);
+    const [kegiatanRes, teknisRes, aktivitasRes, surveiRes] =
+      await Promise.all([
+        axios.get("/kegiatan"),
+        axios.get("/teknis"),
+        axios.get("/aktivitas"),
+        axios.get("/survei"),
+      ]);
 
-      setKegiatanList(kegiatanRes.data?.data || kegiatanRes.data || []);
-      setTeknisList(teknisRes.data?.data || teknisRes.data || []);
-      setAktivitasList(aktivitasRes.data?.data || aktivitasRes.data || []);
-      setSurveiList(surveiRes.data?.data || surveiRes.data || []);
-    } catch (error) {
-      if (error.response?.status === 401 || error.response?.status === 403)
+    setKegiatanList(kegiatanRes.data?.data || kegiatanRes.data || []);
+    setTeknisList(teknisRes.data?.data || teknisRes.data || []);
+    setAktivitasList(aktivitasRes.data?.data || aktivitasRes.data || []);
+    setSurveiList(surveiRes.data?.data || surveiRes.data || []);
+  } catch (error) {
+    if (isAxiosError<{ message?: string }>(error)) {
+      if (error.response?.status === 401 || error.response?.status === 403) {
         return;
+      }
       if (error.response) {
         setError(
-          `Error ${error.response.status}: ${error.response.data.message || "Server error"}`,
+          `Error ${error.response.status}: ${error.response.data?.message || "Server error"}`
         );
       } else if (error.request) {
         setError("No response from server. Check your connection.");
-      } else {
-        setError("Error: " + error.message);
       }
-    } finally {
-      setLoading(false);
+    } else if (error instanceof Error) {
+      setError("Error: " + error.message);
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleDelete = async (id: number) => {
     if (!confirm("Apakah Anda yakin ingin menghapus data kegiatan ini?"))

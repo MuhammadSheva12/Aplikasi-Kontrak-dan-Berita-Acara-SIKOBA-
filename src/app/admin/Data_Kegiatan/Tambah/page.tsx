@@ -29,7 +29,9 @@ const schema = z.object({
   aktivitas_id: z.string().min(1, "Aktivitas wajib dipilih").transform(Number),
 });
 
-type FormData = z.infer<typeof schema>;
+// Input = nilai dari form (string), Output = hasil setelah diproses zod (number)
+type FormInput = z.input<typeof schema>;
+type FormOutput = z.output<typeof schema>;
 
 export default function TambahData() {
   const [isLoading, setIsLoading] = useState(false);
@@ -43,7 +45,7 @@ export default function TambahData() {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<FormData>({
+  } = useForm<FormInput, unknown, FormOutput>({
     resolver: zodResolver(schema),
     defaultValues: {
       teknis_id: "",
@@ -72,7 +74,7 @@ export default function TambahData() {
     fetchData();
   }, []);
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: FormOutput) => {
     setIsLoading(true);
     try {
       await axios.post("/kegiatan", data, { withCredentials: true });

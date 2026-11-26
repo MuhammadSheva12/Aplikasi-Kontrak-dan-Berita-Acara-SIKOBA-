@@ -7,6 +7,8 @@ import axios from "@/app/utils/axiosAPI";
 import SpinnerHalaman from "@/app/components/shared/SpinnerHalaman";
 import Pagination from "@/app/components/shared/Pagination";
 import { showSuccess, showError } from "@/app/utils/toast";
+import { isAxiosError } from "axios";
+import { getErrorMessage } from "@/app/utils/getErrorMessage";
 
 interface MitraSobat {
   id: number;
@@ -51,21 +53,24 @@ export default function DataMitraSobatPage() {
       setError(null);
       const res = await axios.get("/mitra/sobat");
       setData(res.data?.data || res.data || []);
-    } catch (error) {
-      if (error.response?.status === 401 || error.response?.status === 403)
-        return;
-      if (error.response) {
-        setError(
-          `Error ${error.response.status}: ${error.response.data.message || "Server error"}`,
-        );
-      } else if (error.request) {
-        setError("No response from server. Check your connection.");
-      } else {
-        setError("Error: " + error.message);
-      }
-    } finally {
-      setLoading(false);
+} catch (error) {
+  if (isAxiosError<{ message?: string }>(error)) {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      return;
     }
+    if (error.response) {
+      setError(
+        `Error ${error.response.status}: ${error.response.data?.message || "Server error"}`
+      );
+    } else if (error.request) {
+      setError("No response from server. Check your connection.");
+    }
+  } else if (error instanceof Error) {
+    setError("Error: " + error.message);
+  }
+} finally {
+  setLoading(false);
+}
   };
 
   const handleDelete = async (id: number) => {

@@ -7,6 +7,7 @@ import {
   Settings, Database, LogOut, Activity, Newspaper, ChevronRight
 } from "lucide-react";
 import axios from "@/app/utils/axiosAPI";
+import type { LucideIcon } from "lucide-react";
 
 export default function Sidebar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; toggleSidebar: () => void }) {
   const pathname = usePathname();
@@ -70,7 +71,7 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }: { sidebarOpen: b
     router.push("/login");
   };
 
-  const renderLink = (name: string, path: string, Icon: any) => (
+  const renderLink = (name: string, path: string, Icon: LucideIcon) => (
     <button
       onClick={() => handleNavigation(path)}
       className={`group flex items-center gap-x-3 px-2 py-2 rounded-lg w-full text-left transition ${
@@ -185,10 +186,10 @@ function CollapsibleSection({
   handleNavigation,
 }: {
   title: string;
-  icon: any;
+  icon: LucideIcon;
   open: boolean;
   setOpen: (val: boolean) => void;
-  links: { name: string; path: string; icon: any }[];
+  links: { name: string; path: string; icon: LucideIcon }[];
   isActive: (path: string) => boolean;
   handleNavigation: (path: string) => void;
 }) {

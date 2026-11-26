@@ -1,9 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+  type MouseEvent,
+  type InputHTMLAttributes,
+} from "react";
 import { useRouter } from "next/navigation";
 import axios from "@/app/utils/axiosAPI";
 import { showError, showSuccess } from "@/app/utils/toast";
+import { getErrorMessage } from "@/app/utils/getErrorMessage";
 
 interface Option {
   id: number;
@@ -67,7 +75,9 @@ export default function TambahKontrak() {
       .catch(() => showError("Gagal memuat data"));
   }, []);
 
-  const handleChange = (e: any) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((p) => ({ ...p, [name]: value }));
   };
@@ -75,7 +85,7 @@ export default function TambahKontrak() {
   // ============================
   // HANDLE SUBMIT: SIMPAN SAJA (TANPA DOWNLOAD)
   // ============================
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     try {
@@ -99,7 +109,9 @@ export default function TambahKontrak() {
   // ============================
   // HANDLE SUBMIT AND DOWNLOAD: SIMPAN + LANGSUNG DOWNLOAD
   // ============================
-  const handleSubmitAndDownload = async (e: any) => {
+  const handleSubmitAndDownload = async (
+    e: MouseEvent<HTMLButtonElement>
+  ) => {
     e.preventDefault();
     setIsLoading(true);
     try {
@@ -111,7 +123,9 @@ export default function TambahKontrak() {
       const blob = new Blob([res.data]);
       const url = window.URL.createObjectURL(blob);
 
-      const disposition = res.headers["content-disposition"];
+      const disposition = res.headers["content-disposition"] as
+        | string
+        | undefined;
       let fileName = "kontrak.docx";
       if (disposition) {
         const match = disposition.match(/filename="(.+)"/);
@@ -284,7 +298,12 @@ export default function TambahKontrak() {
 // ======================
 // INPUT FIELD
 // ======================
-const InputField = ({ label, placeholder, type = "text", ...rest }: any) => (
+const InputField = ({
+  label,
+  placeholder,
+  type = "text",
+  ...rest
+}: InputHTMLAttributes<HTMLInputElement> & { label: string }) => (
   <div>
     <label className="block text-sm font-medium mb-1 text-gray-700">
       {label}
@@ -308,7 +327,14 @@ const SelectField = ({
   name,
   onChange,
   disabled,
-}: any) => (
+}: {
+  label: string;
+  options: { value: string; label: string }[];
+  value: string;
+  name: string;
+  onChange: (e: ChangeEvent<HTMLSelectElement>) => void;
+  disabled?: boolean;
+}) => (
   <div>
     <label className="block text-sm font-medium mb-1 text-gray-700">
       {label}
@@ -323,7 +349,7 @@ const SelectField = ({
       <option value="" disabled hidden>
         Pilih {label.toLowerCase()}
       </option>
-      {options.map((opt: any) => (
+      {options.map((opt) => (
         <option key={opt.value} value={opt.value}>
           {opt.label}
         </option>

@@ -24,7 +24,7 @@ export default function KelolaPejabat() {
   const [editDIPA, setEditDIPA] = useState<Dipa | null>(null);
   const [showPejabatModal, setShowPejabatModal] = useState(false);
   const [showDipaModal, setShowDipaModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchPejabat();
