@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import axios from "@/app/utils/axiosAPI";
 import React, { useState } from "react";
 import { z } from "zod";
+import { getErrorMessage } from "@/app/utils/getErrorMessage";
 
 // Schema Validasi untuk Mitra Sobat
 const mitraSchema = z.object({
@@ -45,14 +46,9 @@ export default function TambahMitraSobat() {
         "/admin/Mitra_Sobat?status=success&message=" +
           encodeURIComponent("Data berhasil ditambahkan!"),
       );
-    } catch (error) {
-      const msg =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        error.message ||
-        "Gagal menambahkan data";
-      showError("Error: " + msg);
-    } finally {
+} catch (error) {
+  showError(getErrorMessage(error, "Gagal menambahkan data"));
+} finally {
       setIsLoading(false);
     }
   };

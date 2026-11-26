@@ -7,6 +7,7 @@ import { z } from "zod";
 import React, { useState } from "react";
 import axios from "@/app/utils/axiosAPI";
 import { showError } from "@/app/utils/toast";
+import { getErrorMessage } from "@/app/utils/getErrorMessage";
 
 const jabatanPetugasSchema = z.object({
   nama_jabatan: z.string().min(1, "Nama jabatan wajib diisi"),
@@ -37,12 +38,9 @@ export default function TambahJabatanPetugas() {
         "/admin/Jabatan_Petugas?status=success&message=" +
           encodeURIComponent("Data berhasil ditambahkan!"),
       );
-    } catch (error) {
-      const pesanError =
-        error.response?.data?.message ||
-        "Gagal menambahkan data jabatan petugas.";
-      showError(pesanError);
-    } finally {
+} catch (error) {
+  showError(getErrorMessage(error, "Gagal menambahkan data"));
+} finally {
       setIsLoading(false);
     }
   };

@@ -5,6 +5,7 @@ import { HiEye, HiEyeOff, HiLockClosed, HiUser } from "react-icons/hi";
 import { useRouter } from "next/navigation";
 import axios from "@/app/utils/axiosAuth";
 import { motion } from "framer-motion";
+import { getErrorMessage } from "@/app/utils/getErrorMessage";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -28,11 +29,8 @@ export default function LoginPage() {
         router.push("/user/dashboard");
       }
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
-        "Login gagal. Silakan coba lagi.";
-      setError(errorMessage);
+const msg = getErrorMessage(err, "Teks fallback kamu");
+      setError(msg);
       setIsSubmitting(false);
     }
   };

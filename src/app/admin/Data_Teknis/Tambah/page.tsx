@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import React, { useState,} from "react";
 import axios from "@/app/utils/axiosAPI";
+import { getErrorMessage } from "@/app/utils/getErrorMessage";
 
 const teknisSchema = z.object({
   nama_teknis: z.string().min(1, "Nama teknis wajib diisi"),
@@ -38,13 +39,9 @@ export default function TambahTeknis() {
         "/admin/Data_Teknis?status=success&message=" +
           encodeURIComponent("Data berhasil ditambahkan!"),
       );
-    } catch (error) {
-      const msg =
-        error.response?.data?.message ||
-        error.message ||
-        "Gagal menambahkan data";
-      showError(msg);
-    } finally {
+} catch (error) {
+  showError(getErrorMessage(error, "Gagal menambahkan data"));
+} finally {
       setIsLoading(false);
     }
   };

@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import React, { useState } from "react";
 import axios from "@/app/utils/axiosAPI";
+import { getErrorMessage } from "@/app/utils/getErrorMessage";
 
 const pegawaiSchema = z.object({
   nama: z.string().min(1, "Nama wajib diisi"),
@@ -39,13 +40,9 @@ export default function TambahPegawai() {
         "/admin/Data_Pegawai?status=success&message=" +
           encodeURIComponent("Data berhasil ditambahkan!"),
       );
-    } catch (error) {
-      const msg =
-        error.response?.data?.message ||
-        error.message ||
-        "Gagal menambahkan data";
-      showError(msg);
-    } finally {
+} catch (error) {
+  showError(getErrorMessage(error, "Gagal menambahkan data"));
+} finally {
       setIsLoading(false);
     }
   };

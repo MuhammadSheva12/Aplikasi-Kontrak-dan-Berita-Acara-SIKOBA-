@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import React, { useState } from "react";
 import axios from "@/app/utils/axiosAPI";
+import { getErrorMessage } from "@/app/utils/getErrorMessage";
 
 const satuanSchema = z.object({
   uraian: z.string().min(1, "Uraian wajib diisi"),
@@ -36,13 +37,9 @@ export default function TambahSatuan() {
       reset();
       showSuccess("Data satuan berhasil ditambahkan!");
       router.push("/admin/Data_Satuan");
-    } catch (error) {
-      const msg =
-        error.response?.data?.message ||
-        error.message ||
-        "Gagal menambahkan data satuan";
-      showError(msg);
-    } finally {
+} catch (error) {
+  showError(getErrorMessage(error, "Gagal menambahkan data"));
+} finally {
       setIsLoading(false);
     }
   };

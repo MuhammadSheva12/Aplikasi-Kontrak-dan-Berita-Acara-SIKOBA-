@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "@/app/utils/axiosAPI";
 import { useRouter } from "next/navigation";
 import { showError, showSuccess } from "@/app/utils/toast";
+import { getErrorMessage } from "@/app/utils/getErrorMessage";
 
 const mitraSchema = z.object({
   nama: z.string().min(1, "Nama wajib diisi"),
@@ -45,13 +46,9 @@ export default function TambahMitraLainnya() {
         "/admin/Mitra_Lainnya?success&message=" +
           encodeURIComponent("Data berhasil ditambahkan!"),
       );
-    } catch (error) {
-      const msg =
-        error.response?.data?.message ||
-        error.message ||
-        "Gagal menambahkan mitra";
-      showError(msg);
-    } finally {
+} catch (error) {
+  showError(getErrorMessage(error, "Gagal menambahkan data"));
+} finally {
       setIsLoading(false);
     }
   };

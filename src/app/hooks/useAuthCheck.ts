@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import axios from "@/app/utils/axiosAPI";
 import { showError } from "@/app/utils/toast";
+import { isAxiosError } from "axios";
 
 export default function useAuthCheck() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function useAuthCheck() {
     } catch (error) {
       console.error("Auth check failed:", error);
 
-      const status = error?.response?.status;
+      const status = isAxiosError(error) ? error.response?.status : undefined;
 
       if (status === 401 || status === 403) {
         showError("Sesi login sudah habis, silakan login ulang.");
