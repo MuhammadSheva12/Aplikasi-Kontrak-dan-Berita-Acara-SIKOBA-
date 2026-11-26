@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Home, FileText, Users, Clipboard, Layout, Briefcase, Edit,
-  Settings, Database, LogOut, Activity, Receipt, Newspaper, ChevronRight
+  Settings, Database, LogOut, Activity, Newspaper, ChevronRight
 } from "lucide-react";
 import axios from "@/app/utils/axiosAPI";
 

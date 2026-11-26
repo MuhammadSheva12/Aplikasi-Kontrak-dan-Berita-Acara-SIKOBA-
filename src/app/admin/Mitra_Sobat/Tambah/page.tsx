@@ -25,7 +25,6 @@ type FormData = z.infer<typeof mitraSchema>;
 export default function TambahMitraSobat() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const [token, setToken] = useState<string | null>(null);
 
   const {
     register,

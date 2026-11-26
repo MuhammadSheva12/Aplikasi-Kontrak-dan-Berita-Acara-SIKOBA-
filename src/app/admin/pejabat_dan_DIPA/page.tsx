@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import axios from "@/app/utils/axiosAPI";
 import { Pencil } from "lucide-react";
 import { showSuccess, showError } from "@/app/utils/toast";
-import SpinnerHalaman from "@/app/components/shared/SpinnerHalaman";
 
 interface Pejabat {
   id: number;

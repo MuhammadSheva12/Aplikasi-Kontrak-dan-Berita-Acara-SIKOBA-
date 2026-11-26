@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import axios from "@/app/utils/axiosAPI";
 import { Handshake, Contact2, ReceiptText, Newspaper } from "lucide-react";
-import SpinnerHalaman from "@/app/components/shared/SpinnerHalaman";
 
 
 interface StatsData {
