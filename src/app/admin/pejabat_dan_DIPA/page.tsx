@@ -36,7 +36,7 @@ export default function KelolaPejabat() {
       setIsLoading(true);
       const response = await axios.get("/pejabat");
       setPejabatList(response.data?.data || response.data);
-    } catch (error) {
+    } catch  {
       showError("Gagal memuat data pejabat.");
     } finally {
       setIsLoading(false);
@@ -48,7 +48,7 @@ export default function KelolaPejabat() {
       setIsLoading(true);
       const response = await axios.get("/dipa");
       setDipaList(response.data?.data || response.data);
-    } catch (error) {
+    } catch  {
       showError("Gagal memuat data DIPA.");
     } finally {
       setIsLoading(false);
@@ -74,7 +74,7 @@ export default function KelolaPejabat() {
       setEditPejabat(null);
       fetchPejabat();
       showSuccess("Data pejabat berhasil diupdate");
-    } catch (error) {
+    } catch  {
       showError("Gagal mengedit data pejabat");
     }
   };
@@ -98,7 +98,7 @@ export default function KelolaPejabat() {
       setEditDIPA(null);
       fetchDipa();
       showSuccess("Data DIPA berhasil diupdate");
-    } catch (error) {
+    } catch  {
       showError("Gagal mengedit data DIPA");
     }
   };

@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import React, { useState, useEffect } from "react";
 import axios from "@/app/utils/axiosAPI";
+import { isAxiosError } from "axios";
 
 type Teknis = {
   id: number;
@@ -62,7 +63,7 @@ export default function TambahUser() {
         ]);
         setTeknisOptions(teknisRes.data.data);
         setPegawaiOptions(pegawaiRes.data.data);
-      } catch (error) {
+      } catch {
         showError("Gagal memuat data teknis/pegawai");
       }
     };
@@ -99,15 +100,16 @@ export default function TambahUser() {
           encodeURIComponent("User berhasil ditambahkan!"),
       );
     } catch (error) {
-      const msg =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        error.message ||
-        "Gagal menambahkan user";
-      showError(msg);
-    } finally {
-      setIsLoading(false);
-    }
+  let msg = "Gagal menambahkan user";
+  if (isAxiosError<{ message?: string; error?: string }>(error)) {
+    msg = error.response?.data?.message || error.response?.data?.error || error.message || msg;
+  } else if (error instanceof Error) {
+    msg = error.message || msg;
+  }
+  showError(msg);
+} finally {
+  setIsLoading(false);
+}
   };
 
   return (
